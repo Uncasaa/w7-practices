@@ -26,7 +26,8 @@ functionName(1,2);
 const inputElement = (type,name, title) =>{
     return `
     <div>
-        <label>${title}</label>
+        <h1>Adatkezelő form</h1>
+        <label>${title}</label><br><br>
         <input type="${type}" name="${name}">
     </div>
     `;
