@@ -23,16 +23,16 @@ functionName(1,2);
 
 */
 
-const inputElement = (type,name, title) =>{
+const inputElement = (type, name, title, req = "") => {
     return `
-    <div>
+    <div class="${type}">
         <label>${title}</label>
-        <input type="${type}" name="${name}">
+        <input type="${type}" name="${name}" ${req}>
     </div>
     `;
 }
 
-const selectElement = (type,name, title, options) =>{
+const selectElement = (type, name, title, options) => {
     let optionsToSelect = "";
     for (const o of options) {
         optionsToSelect += `
@@ -59,25 +59,103 @@ const formElement = "<form>" + inputElement("text", "firstName") +         input
 +         inputElement("radio", "newsletter")
 +         inputElement("checkbox", "terms")
 + "</form>"
-*/ 
+*/
 
 //const test = "valami" "valami2"
 
+/*
+const nameData = {
+    type: "text",
+    name: "firstName",
+    label: "Keresztneved"
+};
+*/
+
+const anotherFormFields = [
+    {
+        type: "text",
+        name: "street",
+        label: "Közterület neve"
+    },
+    {
+        type: "number",
+        name: "houseNumber",
+        label: "Házszám"
+    },
+    {
+        type: "number",
+        name: "zipCode",
+        label: "Irányítószám"
+    },
+    {
+        type: "text",
+        name: "city",
+        label: "Település neve"
+    }
+];
+
+
+const formFields = [
+    {
+        type: "text",
+        name: "firstName",
+        label: "Keresztneved"
+    },
+    {
+        type: "email",
+        name: "personalEmail",
+        label: "Email címed",
+        req: "required"
+    },
+    {
+        type: "file",
+        name: "profilePicture",
+        label: "Profilképed"
+    },
+    {
+        type: "checkbox",
+        name: "newsletter",
+        label: "Hírlevet szeretnék kapni"
+    },
+    {
+        type: "checkbox",
+        name: "terms",
+        label: "Elfogadom a felhasználási feltételeket"
+    }
+];
+/*
 const formElement = `
     <form id="form">
-        ${inputElement("text","firstName", "Keresztneved")}
+        ${inputElement("text", "firstName", "Keresztneved")}
+        ${inputElement("email", "personalEmail", "Email címed", "required")}
         ${inputElement("file", "profilePicture", "Profilképed")}
-        ${inputElement("email", "personalEmail", "Email címed")}
         ${inputElement("checkbox", "newsletter", "Hírlevelet szeretnék kapni")}
         ${inputElement("checkbox", "terms", "Elfogadom a felhasználási feltételeket")}
         ${selectElement("select", "where", "Hol hallottál rólunk?", ["interneten", "ismerőstől", "egyéb"])}
         <button>OK</button>
     </form>
 `;
+*/
 
-const formSubmit = (event) =>{
+const formElement = (ffs, id) => {
+    let inputs = "";
+    for (const ff of ffs) {
+        inputs += inputElement(ff.type, ff.name, ff.label, ff.req)
+    }
+    return `
+    <form id="${id}">
+    ${inputs}
+    ${selectElement("select", "where", "Hol hallottál rólunk?", ["interneten", "ismerőstől", "egyéb"])}
+    <button>OK</button>
+</form>
+
+    `
+}
+
+
+const formSubmit = (event) => {
     event.preventDefault();
-    
+
     const et = event.target;
     console.log(et);
     et.classList.add("submitted");
@@ -87,24 +165,36 @@ const formSubmit = (event) =>{
 
 }
 
-const inputUpdate = (event) =>{
-    if (event.target.getAttribute("name") === "firstName"){
+const inputUpdate = (event) => {
+    if (event.target.getAttribute("name") === "firstName") {
         document.getElementById("inputValue").innerHTML = event.target.value;
 
     }
+    if (event.target.getAttribute("name") === "profilePicture") {
+        console.log(event.target.files[0]);
+
+        const image = URL.createObjectURL(event.target.files[0]);
+        document.getElementById("inputValue").insertAdjacentHTML("beforeend", `
+        <img src="${image}>
+        `);
+        document.getElementById("inputValue").innerHTML = event.target.value;
+
+    }
+
     console.log(event.target.closest("#form"));
 }
 
 function loadEvent() {
     const root = document.getElementById("root");
-    root.insertAdjacentHTML("afterbegin", formElement)
+    root.insertAdjacentHTML("afterbegin", formElement(formFields, "form"))
+    root.insertAdjacentHTML("afterbegin", formElement(anotherFormFields, "form2"));
     root.insertAdjacentHTML("afterbegin", `
         <div id="inputValue"></div>
     `);
 
     const form = document.getElementById("form");
     form.addEventListener("submit", formSubmit)
-    
+
     const inputList = form.querySelectorAll("input");
 
     for (const input of inputList) {
